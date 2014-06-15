@@ -1,57 +1,383 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" rel="stylesheet">
-  <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-  <title>App Engine Endpoints with Google Cloud Messaging</title>
-</head>
-<body>
-  <!--
-    A form that takes a text value and submits it to the endpoint,
-    access to the endpoint is enabled once the client is loaded below
-  -->
-  <form action="javascript:void(0);">
-    <input id="myMessage" type="text" name="message" />
-    <input id="mySubmit" type="submit" value="Send Message" />
-  </form>
-  <br />
-  Your App Engine <a href="/_ah/admin">Admin Console</a> provides some information about your App Engine app.
-  <br />
-  Endpoints <a href="/_ah/api/explorer">Api Explorer</a> lets you access the endpoints API directly.
-  <br />
-  Check out the <a href="https://developers.google.com/appengine/docs/java/">documentation</a> for more information on Google App Engine for Java.
-  <br />
-  Check out the <a href="https://developers.google.com/appengine/docs/java/endpoints/">endpoints documentation</a> for more information on Google Endpoints for Java.
-  <script type="text/javascript">
-    // a function that enables clicking on the from defined above
-    function enableClick() {
-      document.getElementById('mySubmit').onclick = function() {
-        var name = document.getElementById('myMessage').value
-        gapi.client.messaging.messagingEndpoint.sendMessage({'message': name}).execute(
-          function(response) {
-            if(response && response.error) {
-              alert("Error Code : " + response.error.code + " - " + response.error.message);
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>Angry Birds Sync</title><link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootswatch/3.0.1/slate/bootstrap.min.css"><link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.2/css/font-awesome.min.css"><link rel="stylesheet" href="//fonts.googleapis.com/css?family=Roboto:400,700|Inconsolata|Raleway:200"><style>/* Highlight.js Theme Tomorrow Night Eighties */
+    pre{color:#fff;background:#272b30;border:1px solid rgba(255, 255, 255, 0.2)}
+    pre code{display:block;padding:.5em;background:#272b30}
+    .hljs-comment,.hljs-title{color:#999}.hljs-variable,.hljs-attribute,.hljs-tag,.hljs-regexp,.ruby .hljs-constant,.xml .hljs-tag .hljs-title,.xml .hljs-pi,.xml .hljs-doctype,.html .hljs-doctype,.css .hljs-id,.css .hljs-class,.css .hljs-pseudo{color:#f2777a}.hljs-number,.hljs-preprocessor,.hljs-pragma,.hljs-built_in,.hljs-literal,.hljs-params,.hljs-constant{color:#f99157}.ruby .hljs-class .hljs-title,.css .hljs-rules .hljs-attribute{color:#fc6}.hljs-string,.hljs-value,.hljs-inheritance,.hljs-header,.ruby .hljs-symbol,.xml .hljs-cdata{color:#9c9}.css .hljs-hexcolor{color:#6cc}.hljs-function,.python .hljs-decorator,.python .hljs-title,.ruby .hljs-function .hljs-title,.ruby .hljs-title .hljs-keyword,.perl .hljs-sub,.javascript .hljs-title,.coffeescript .hljs-title{color:#69c}.hljs-keyword,.javascript .hljs-function{color:#c9c}.hljs{display:block;background:#2d2d2d;color:#ccc;padding:.5em}.coffeescript .javascript,.javascript .xml,.tex .hljs-formula,.xml .javascript,.xml .vbscript,.xml .css,.xml .hljs-cdata{opacity:.5}</style><style>body,
+    h4,
+    h5 {
+    font-family: 'Roboto' sans-serif !important;
+    }
+    h1,
+    h2,
+    h3,
+    .aglio {
+    font-family: 'Raleway' sans-serif !important;
+    }
+    h1 a,
+    h2 a,
+    h3 a,
+    h4 a,
+    h5 a {
+    display: none;
+    }
+    h1:hover a,
+    h2:hover a,
+    h3:hover a,
+    h4:hover a,
+    h5:hover a {
+    display: inline;
+    }
+    code {
+    color: #222;
+    background-color: #aaa;
+    font-family: 'Inconsolata' monospace !important;
+    }
+    a[data-target] {
+    cursor: pointer;
+    }
+    h4 {
+    font-size: 100%;
+    font-weight: bold;
+    text-transform: uppercase;
+    }
+    .back-to-top {
+    position: fixed;
+    z-index: 1;
+    bottom: 0px;
+    right: 24px;
+    padding: 4px 8px;
+    color: #aaa;
+    background-color: #171b20;
+    text-decoration: none !important;
+    border-top: 1px solid rgba(0,0,0,0.1);
+    border-left: 1px solid rgba(0,0,0,0.1);
+    border-right: 1px solid rgba(0,0,0,0.1);
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    }
+    .panel {
+    overflow: hidden;
+    }
+    .panel-heading code {
+    color: #000;
+    background-color: transparent;
+    }
+    .panel-heading h3 {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    }
+    a.list-group-item {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    }
+    a.list-group-item.heading {
+    background-color: #3e444c;
+    }
+    .list-group-item.collapse {
+    display: none;
+    }
+    #nav {
+    margin-top: 38px;
+    min-width: 255px;
+    top: 0;
+    bottom: 0;
+    padding-right: 12px;
+    padding-bottom: 12px;
+    overflow-y: auto;
+    }
+</style></head><body><a href="#top" class="text-muted back-to-top"><i class="fa fa-toggle-up"></i>&nbsp;Back to top</a><div class="container"><div class="row"><div class="col-md-3"><nav id="nav" class="collapse hidden-sm hidden-xs nav"><div class="list-group"><a href="#" class="list-group-item heading">Home</a></div><div class="list-group"><a href="#page:client" class="list-group-item heading">Client</a><a href="#page:client,header:client-client" class="list-group-item"><i class="fa fa-arrow-circle-down"></i>&nbsp;Client</a><a href="#page:client,header:client-client-list" class="list-group-item"><i class="fa fa-bars"></i>&nbsp;Client List</a><a href="#page:client,header:client-client-list-get" style="padding-left: 32px" class="list-group-item"><i class="fa fa-arrow-circle-down"></i>&nbsp;Show Clients</a><a href="#page:client,header:client-client-list-post" style="padding-left: 32px" class="list-group-item"><i class="fa fa-plus-square"></i>&nbsp;Add New Client</a></div><p style="text-align: center"><a href="https://angrybirds-sync.appspot.com/">https://angrybirds-sync.appspot.com/</a></p></nav></div><div class="col-md-9"><div data-bind="visible: page() == 'home'"><header><div class="page-header"><h1 id="top">Angry Birds Sync</h1></div></header><div class="description"><p><a href="https://angrybirds-sync.appspot.com/"><strong>Angry Birds Sync API</strong></a> documentation.</p>
+    <h2 id="aplikacja-mobilna-pozwala-na-synchronizacje-w-chmurze-wynik-w-rozgrywki-gry-angry-birds-">Aplikacja mobilna pozwala na synchronizacje w chmurze wyników rozgrywki gry Angry Birds. </h2>
+    <p>Celem zadania było stworzenie infrastruktury sieciowej przeznaczonej do umożliwienia synchronizowania wyników pomiędzy urządzeniami. Oprogramowanie jest może służyć jako część większego projektu, w obecnym stadium wszelkie wyniki, które w docelowym projekcie byłyby pobierane z gry, są generowane pseudolosowo na bazie predefiniowanych struktur danych.</p>
+    <h2 id="linki">Linki</h2>
+    <h3 id="api-endpoint">API Endpoint</h3>
+    <blockquote>
+        <p><a href="https://angrybirds-sync.appspot.com/">https://angrybirds-sync.appspot.com/</a></p>
+    </blockquote>
+    <h3 id="git-respositories">Git Respositories</h3>
+    <blockquote>
+        <p>Github: </p>
+        <p><a href="https://github.com/ArturSkowronski/studia-AngryBirdsSync.git">https://github.com/ArturSkowronski/studia-AngryBirdsSync.git</a></p>
+    </blockquote>
+    <h3 id="continous-integration-project">Continous Integration Project</h3>
+    <blockquote>
+        <p><a href="https://www.codeship.io/projects/18774">https://www.codeship.io/projects/18774</a></p>
+    </blockquote>
+    <h3 id="api-explorer">API Explorer</h3>
+    <blockquote>
+        <p><a href="https://apis-explorer.appspot.com/apis-explorer/?base=https://angrybirds-sync.appspot.com/_ah/api#p/">https://apis-explorer.appspot.com/apis-explorer/?base=https://angrybirds-sync.appspot.com/_ah/api#p/</a></p>
+    </blockquote>
+    <h3 id="admin-console">Admin Console</h3>
+    <blockquote>
+        <p><a href="https://angrybirds-sync.appspot.com/_ah/admin">https://angrybirds-sync.appspot.com/_ah/admin</a></p>
+    </blockquote>
+    <hr>
+    <h2 id="dodatkowe-dokumentacje">Dodatkowe dokumentacje</h2>
+    <h3 id="google-app-engine">Google App Engine</h3>
+    <blockquote>
+        <p><a href="https://developers.google.com/appengine/docs/java/">https://developers.google.com/appengine/docs/java/</a></p>
+    </blockquote>
+    <h3 id="google-endpoints">Google Endpoints</h3>
+    <blockquote>
+        <p><a href="https://developers.google.com/appengine/docs/java/endpoints/">https://developers.google.com/appengine/docs/java/endpoints/</a></p>
+    </blockquote>
+    <h1 id="kroki-implementacji">Kroki implementacji</h1>
+    <h2 id="android">Android</h2>
+    <p>Wersja docelowa SDK: 19
+        Wersja minimalna SDK: 8</p>
+    <h3 id="u-yte-biblioteki-zewn-trzne-">Użyte biblioteki zewnętrzne:</h3>
+    <ul>
+        <li>AppCompat    </li>
+        <li>Retrofit</li>
+        <li>Apache Commons</li>
+        <li>HTTPOk</li>
+        <li>Dagger</li>
+        <li>ActionBar Sherlock</li>
+    </ul>
+    <h3 id="wymagania-dodatkowe">Wymagania Dodatkowe</h3>
+    <p>Wspieranie przez telefon Google APIs.</p>
+    <h3 id="spos-b-dzia-ania">Sposób działania</h3>
+    <ul>
+        <li>Aplikacja Androidowa loguje użytkownika</li>
+        <li>Aplikacja podpisuje requesty kluczem publicznym użytkownika </li>
+        <li>Aplikacja umożliwia generowanie nowego pakietu danych</li>
+        <li>Aplikacja umożliwia wysłanie nowego zestawu danych w celu zaktualizowanie stanu chmury</li>
+        <li>Aplikacja umożliwia przeglądnięcie historii wyników</li>
+    </ul>
+    <h3 id="dodatkowe-informacje">Dodatkowe informacje</h3>
+    <p>Aplikacja rozpoznaje urządzenie użytkownika za pomocą numeru IMEI oraz konta użytkownika</p>
+    <h2 id="webserver">WebServer</h2>
+    <p>Wersja App Engine SDK: 1.9.6
+        Wersja Datastore API: 2.3.5</p>
+    <h3 id="u-yte-biblioteki-zewn-trzne-">Użyte biblioteki zewnętrzne:</h3>
+    <ul>
+        <li>ApacheCommons</li>
+        <li>Objectify</li>
+        <li>DataNucleus</li>
+    </ul>
+    <h3 id="kroki-implementacyjne">Kroki Implementacyjne</h3>
+    <ul>
+        <li>Utworzenie nowego projektu Google App Engine</li>
+        <li>Ustawienie parametrów skalowania - w naszym przypadku najtańsze rozwiązanie z replikacją opóźnioną o 60 sekund między instancjami, 3 instancje</li>
+        <li>Aktywowanie Android API w ramach projektu</li>
+        <li>Wygenerowanie kluczy aplikacji po stronie klienta/serwera</li>
+        <li>Utworzenie Modelu i wygenerowanie kluczy do bazy danych</li>
+        <li>Utworzenie projektu</li>
+        <li>Deployment projektu za pomocą wcześniej utworzonych kluczy</li>
+    </ul>
+</div><a href="#page:client" class="btn btn-default pull-right">Next&nbsp;<i class="fa fa-arrow-circle-right"></i></a><div class="clearfix"></div><hr></div><div data-bind="visible: page() == 'client', style: {marginTop: page() == 'client' ? '38px' : ''}"><div class="panel panel-default"><div class="panel-heading"><h2 id="client">Client&nbsp;<a href="#page:client"><i class="fa fa-link"></i></a></h2></div><div class="panel-body"><p>Dokumentacja Google Client API</p>
+    <hr><h3 id="client-client">Client&nbsp;<a href="#page:client,header:client-client"><i class="fa fa-link"></i></a></h3><p>Showing and updating client</p>
+    <section id="client-client-get" class="panel panel-info"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Add New Client</span><a href="#page:client,header:client-client-get" class="btn btn-xs btn-info">GET</a>&nbsp;<code>/client/{id}</code></div><div class="panel-body"><p>Adding new client. New Client have login, temp-password (must be changed after first login) </p>
+    </div><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#898405" class="pull-right">Toggle</a></li><li id="898405" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization-Token</span>: <span class="hljs-string">Admin_JWT</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>201</code></strong><a data-toggle="collapse" data-target="#916193" class="pull-right">Toggle</a></li><li id="916193" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization-Token</span>: <span class="hljs-string">Admin_JWT</span><br></code></pre><h5>Body</h5><pre><code>[
+        {
+        "<span class="hljs-attribute">id</span>":<span class="hljs-value"><span class="hljs-string">"12141"</span></span>,
+        "<span class="hljs-attribute">name</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">surname</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">firm</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">email</span>":<span class="hljs-value"><span class="hljs-string">"angry@bird.com"</span></span>,
+        "<span class="hljs-attribute">locations_max</span>":<span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">created_at</span>":<span class="hljs-value"><span class="hljs-string">"dd-mm-YY HH:MM"</span></span>,
+        "<span class="hljs-attribute">updated_at</span>":<span class="hljs-value"><span class="hljs-string">"dd-mm-YY HH:MM"</span></span>,
+        "<span class="hljs-attribute">configurations</span>":<span class="hljs-value">[ 
+            {
+
             }
-          }
-        );
-      }
+        ]</span>,
+        "<span class="hljs-attribute">account-status</span>":<span class="hljs-value"><span class="hljs-number">1</span>
+    </span>}
+        ]
+    </code></pre><h5>Schema</h5><pre><code>{
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"array"</span>,
+        <span class="hljs-string">"maxItems"</span>: <span class="hljs-number">50</span>,
+        <span class="hljs-string">"items"</span>: {
+        <span class="hljs-string">"type"</span>:<span class="hljs-string">"object"</span>
+        <span class="hljs-string">"properties"</span>: {
+        <span class="hljs-string">"name"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Name of newly created client for listing usage"</span>
+        },
+        <span class="hljs-string">"admin-login"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Login provided for newly created client"</span>
+        },
+        <span class="hljs-string">"account-status"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"number"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Level of Access of account"</span>,
+        <span class="hljs-string">"options"</span>: {
+        <span class="hljs-number">0</span>: <span class="hljs-string">"Account Unactive"</span>,
+        <span class="hljs-number">1</span>: <span class="hljs-string">"Account Active"</span>
+        }
+        }
+        }
+        }
+        }
+    </code></pre></li></ul></section><hr><h3 id="client-client-list">Client List&nbsp;<a href="#page:client,header:client-client-list"><i class="fa fa-link"></i></a></h3><p>Creating and Showing Clients</p>
+    <section id="client-client-list-get" class="panel panel-info"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Show Clients</span><a href="#page:client,header:client-client-list-get" class="btn btn-xs btn-info">GET</a>&nbsp;<code>/client</code></div><div class="panel-body"><p>Show list of Clients</p>
+    </div><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#502848" class="pull-right">Toggle</a></li><li id="502848" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization-Token</span>: <span class="hljs-string">Admin_JWT</span><br></code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>201</code></strong><a data-toggle="collapse" data-target="#628790" class="pull-right">Toggle</a></li><li id="628790" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization-Token</span>: <span class="hljs-string">Admin_JWT</span><br></code></pre><h5>Body</h5><pre><code>[
+        {
+        "<span class="hljs-attribute">id</span>":<span class="hljs-value"><span class="hljs-string">"12141"</span></span>,
+        "<span class="hljs-attribute">name</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">surname</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">firm</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">email</span>":<span class="hljs-value"><span class="hljs-string">"angry@bird.com"</span></span>,
+        "<span class="hljs-attribute">locations_max</span>":<span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">created_at</span>":<span class="hljs-value"><span class="hljs-string">"dd-mm-YY HH:MM"</span></span>,
+        "<span class="hljs-attribute">updated_at</span>":<span class="hljs-value"><span class="hljs-string">"dd-mm-YY HH:MM"</span></span>,
+        "<span class="hljs-attribute">configurations</span>":<span class="hljs-value">[ 
+            {
+
+            }
+        ]</span>,
+        "<span class="hljs-attribute">account-status</span>":<span class="hljs-value"><span class="hljs-number">1</span>
+    </span>}
+        ]
+    </code></pre><h5>Schema</h5><pre><code>{
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"array"</span>,
+        <span class="hljs-string">"maxItems"</span>: <span class="hljs-number">50</span>,
+        <span class="hljs-string">"items"</span>: {
+        <span class="hljs-string">"type"</span>:<span class="hljs-string">"object"</span>
+        <span class="hljs-string">"properties"</span>: {
+        <span class="hljs-string">"name"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Name of newly created client for listing usage"</span>
+        },
+        <span class="hljs-string">"admin-login"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Login provided for newly created client"</span>
+        },
+        <span class="hljs-string">"account-status"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"number"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Level of Access of account"</span>,
+        <span class="hljs-string">"options"</span>: {
+        <span class="hljs-number">0</span>: <span class="hljs-string">"Account Unactive"</span>,
+        <span class="hljs-number">1</span>: <span class="hljs-string">"Account Active"</span>
+        }
+        }
+        }
+        }
+        }
+    </code></pre></li></ul></section><section id="client-client-list-post" class="panel panel-success"><div class="panel-heading"><span style="text-transform: lowercase" class="pull-right">Add New Client</span><a href="#page:client,header:client-client-list-post" class="btn btn-xs btn-success">POST</a>&nbsp;<code>/client</code></div><div class="panel-body"><p>Adding new client. New Client have login, temp-password (must be changed after first login) </p>
+    </div><ul class="list-group"><li class="list-group-item"><strong>Request</strong><a data-toggle="collapse" data-target="#577094" class="pull-right">Toggle</a></li><li id="577094" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization-Token</span>: <span class="hljs-string">Admin_JWT</span><br></code></pre><h5>Body</h5><pre><code>{
+        "<span class="hljs-attribute">name</span>":<span class="hljs-value"><span class="hljs-string">"Artur"</span></span>,
+        "<span class="hljs-attribute">surname</span>":<span class="hljs-value"><span class="hljs-string">"Skowronski"</span></span>,
+        "<span class="hljs-attribute">firm</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">email</span>":<span class="hljs-value"><span class="hljs-string">"angry@bird.com"</span></span>,
+        "<span class="hljs-attribute">locations-max</span>":<span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">account-status</span>": <span class="hljs-value"><span class="hljs-number">1</span>
+</span>}
+    </code></pre><h5>Schema</h5><pre><code>{
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"object"</span>,
+        <span class="hljs-string">"properties"</span>: {
+        <span class="hljs-string">"name"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Name of newly created client for listing usage"</span>
+        },
+        <span class="hljs-string">"e-mail"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Login provided for newly created client"</span>
+        },
+        <span class="hljs-string">"locations-max"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"number"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"availible amount of locations client can create"</span>
+        },
+        <span class="hljs-string">"account-status"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"number"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Level of Access of account"</span>,
+        <span class="hljs-string">"options"</span>: {
+        <span class="hljs-number">0</span>: <span class="hljs-string">"Account Unactive"</span>,
+        <span class="hljs-number">1</span>: <span class="hljs-string">"Account Active"</span>
+        }
+        }
+        }
+        }
+    </code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>201</code></strong><a data-toggle="collapse" data-target="#817579" class="pull-right">Toggle</a></li><li id="817579" class="list-group-item collapse"><h5>Headers</h5><pre><code><span class="hljs-attribute">Content-Type</span>: <span class="hljs-string">application/json</span><br><span class="hljs-attribute">Authorization-Token</span>: <span class="hljs-string">Admin_JWT</span><br></code></pre><h5>Body</h5><pre><code>[
+        {
+        "<span class="hljs-attribute">id</span>":<span class="hljs-value"><span class="hljs-string">"12141"</span></span>,
+        "<span class="hljs-attribute">name</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">surname</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">firm</span>":<span class="hljs-value"><span class="hljs-string">"AngryBirds"</span></span>,
+        "<span class="hljs-attribute">email</span>":<span class="hljs-value"><span class="hljs-string">"angry@bird.com"</span></span>,
+        "<span class="hljs-attribute">locations_max</span>":<span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">created_at</span>":<span class="hljs-value"><span class="hljs-string">"dd-mm-YY HH:MM"</span></span>,
+        "<span class="hljs-attribute">updated_at</span>":<span class="hljs-value"><span class="hljs-string">"dd-mm-YY HH:MM"</span></span>,
+        "<span class="hljs-attribute">configurations</span>":<span class="hljs-value">[ 
+            {
+
+            }
+        ]</span>,
+        "<span class="hljs-attribute">account-status</span>":<span class="hljs-value"><span class="hljs-number">1</span>
+    </span>}
+        ]
+    </code></pre><h5>Schema</h5><pre><code>{
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"array"</span>,
+        <span class="hljs-string">"maxItems"</span>: <span class="hljs-number">50</span>,
+        <span class="hljs-string">"items"</span>: {
+        <span class="hljs-string">"type"</span>:<span class="hljs-string">"object"</span>
+        <span class="hljs-string">"properties"</span>: {
+        <span class="hljs-string">"name"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Name of newly created client for listing usage"</span>
+        },
+        <span class="hljs-string">"admin-login"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"string"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Login provided for newly created client"</span>
+        },
+        <span class="hljs-string">"account-status"</span>: {
+        <span class="hljs-string">"type"</span>: <span class="hljs-string">"number"</span>,
+        <span class="hljs-string">"desc"</span>: <span class="hljs-string">"Level of Access of account"</span>,
+        <span class="hljs-string">"options"</span>: {
+        <span class="hljs-number">0</span>: <span class="hljs-string">"Account Unactive"</span>,
+        <span class="hljs-number">1</span>: <span class="hljs-string">"Account Active"</span>
+        }
+        }
+        }
+        }
+        }
+    </code></pre></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>401</code></strong></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>409</code></strong></li><li class="list-group-item"><strong>Response&nbsp;&nbsp;<code>422</code></strong></li></ul></section></div></div><a href="#" class="btn btn-default"><i class="fa fa-arrow-circle-left"></i> Previous</a><div class="clearfix"></div><hr></div></div></div></div><p style="text-align: center;" class="text-muted">Generated by <a href="https://github.com/danielgtaylor/aglio" class="aglio">aglio</a> on 15 Jun 2014</p><div id="localFile" style="display: none; position: absolute; top: 0; left: 0; width: 100%; color: white; background: red; font-size: 150%; text-align: center; padding: 1em;">This page may not display correctly when opened as a local file. Instead, view it from a web server.
+
+</div></body><script src="//code.jquery.com/jquery-1.10.1.min.js"></script><script src="//netdna.bootstrapcdn.com/bootstrap/3.0.2/js/bootstrap.min.js"></script><script>(function() {
+  if (location.protocol === 'file:') {
+    document.getElementById('localFile').style.display = 'block';
+  }
+
+}).call(this);
+</script><script>(function() {
+  $('table').addClass('table');
+
+}).call(this);
+</script><script src="http://cdnjs.cloudflare.com/ajax/libs/knockout/3.0.0/knockout-min.js"></script><script>(function() {
+  var App;
+
+  App = (function() {
+    function App() {
+      this.page = ko.observable('home');
     }
-    // Once the gapis are loaded, we can load the Messaging Endpoint's javascript client libraries
-    function init() {
-      var apiName = 'messaging'
-      var apiVersion = 'v1'
-      // set the apiRoot to work on a deployed app and locally with devappserver
-      var apiRoot = '//' + window.location.host + '/_ah/api';
-      var callback = function() {
-        enableClick();
-      }
-      gapi.client.load(apiName, apiVersion, callback, apiRoot);
+
+    return App;
+
+  })();
+
+  window.app = new App();
+
+  window.onhashchange = function() {
+    var parts, v, vars, _i, _len, _ref;
+    vars = {};
+    _ref = location.hash.substr(1).split(',');
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+      v = _ref[_i];
+      parts = v.split(':');
+      vars[parts[0]] = parts[1];
     }
-  </script>
-  <!--
-   Load the Google APIs Client Library for JavaScript
-   More info here : https://developers.google.com/api-client-library/javascript/reference/referencedocs
-  -->
-  <script src="https://apis.google.com/js/client.js?onload=init"></script>
-</body>
-</html>
+    window.app.page(vars.page || 'home');
+    if (vars.header) {
+      return $("#" + vars.header)[0].scrollIntoView(true);
+    } else {
+      return window.scrollTo(0, 0);
+    }
+  };
+
+  ko.applyBindings(window.app);
+
+  window.onhashchange();
+
+}).call(this);
+</script></html>

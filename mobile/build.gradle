@@ -32,7 +32,6 @@ dependencies {
     compile 'com.angry.web:deviceStateEndpoint:v1-1.18.0-rc-SNAPSHOT'
     compile 'com.android.support:appcompat-v7:19.+'
     compile(group: 'com.google.api-client', name: 'google-api-client', version: '1.17.0-rc') {
-        // Exclude artifacts that the Android SDK/Runtime provides.
         exclude(group: 'xpp3', module: 'xpp3')
         exclude(group: 'org.apache.httpcomponents', module: 'httpclient')
         exclude(group: 'junit', module: 'junit')
